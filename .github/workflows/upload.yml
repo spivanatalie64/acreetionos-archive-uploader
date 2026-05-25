@@ -10,6 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Notify Discord (Start)
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{"content": "AcreetionOS ISO upload to the Internet Archive has started."}' \
+            "$DISCORD_WEBHOOK"
+
       - name: Install internetarchive
         run: pip install internetarchive
 
@@ -34,7 +42,7 @@ jobs:
             --metadata="subject:linux;operating system;acreetionos" \
             --no-derive
 
-      - name: Notify Discord
+      - name: Notify Discord (Finish)
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
