@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Notify Discord (Start)
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
@@ -42,10 +45,18 @@ jobs:
             --metadata="subject:linux;operating system;acreetionos" \
             --no-derive
 
+      - name: Send Newsletter
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
+        run: |
+          pip install anthropic requests
+          python3 newsletter.py
+
       - name: Notify Discord (Finish)
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           curl -H "Content-Type: application/json" \
-            -d '{"content": "AcreetionOS ISOs have been uploaded to the Internet Archive successfully."}' \
+            -d '{"content": "AcreetionOS ISOs have been uploaded to the Internet Archive successfully. Newsletter sent."}' \
             "$DISCORD_WEBHOOK"
