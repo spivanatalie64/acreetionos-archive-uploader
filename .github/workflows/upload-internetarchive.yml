@@ -1,0 +1,51 @@
+name: Upload AcreetionOS to Internet Archive
+
+on:
+  schedule:
+    - cron: '0 0 * * 1,3,5'
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify Discord (Start)
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{"content": "AcreetionOS ISO upload to the Internet Archive has started."}' \
+            "$DISCORD_WEBHOOK"
+
+      - name: Install internetarchive
+        run: pip install internetarchive
+
+      - name: Download ISOs
+        run: |
+          curl -L -o AcreetionOS-1.0-x86_64.iso https://iso.acreetionos.org:8448/acreetion/AcreetionOS-1.0-x86_64.iso
+          curl -L -o AcreetionOS_XL-1.0-x86_64.iso https://iso.acreetionos.org:8448/acreetion/AcreetionOS_XL-1.0-x86_64.iso
+
+      - name: Upload to Internet Archive
+        env:
+          IA_ACCESS_KEY_ID: ${{ secrets.IA_ACCESS_KEY }}
+          IA_SECRET_ACCESS_KEY: ${{ secrets.IA_SECRET_KEY }}
+        run: |
+          ia upload AcreetionOS-1.0-x86_64 AcreetionOS-1.0-x86_64.iso \
+            --metadata="mediatype:software" \
+            --metadata="title:AcreetionOS 1.0 x86_64" \
+            --metadata="subject:linux;operating system;acreetionos" \
+            --no-derive
+          ia upload AcreetionOS_XL-1.0-x86_64 AcreetionOS_XL-1.0-x86_64.iso \
+            --metadata="mediatype:software" \
+            --metadata="title:AcreetionOS XL 1.0 x86_64" \
+            --metadata="subject:linux;operating system;acreetionos" \
+            --no-derive
+
+      - name: Notify Discord (Finish)
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{"content": "AcreetionOS ISOs have been uploaded to the Internet Archive successfully."}' \
+            "$DISCORD_WEBHOOK"
