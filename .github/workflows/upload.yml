@@ -42,6 +42,19 @@ jobs:
             --metadata="subject:linux;operating system;acreetionos" \
             --no-derive
 
+      - name: Upload to SourceForge
+        env:
+          SF_SSH_KEY: ${{ secrets.SF_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SF_SSH_KEY" > ~/.ssh/sf_deploy_key
+          chmod 600 ~/.ssh/sf_deploy_key
+          ssh-keyscan frs.sourceforge.net >> ~/.ssh/known_hosts
+          scp -i ~/.ssh/sf_deploy_key \
+            AcreetionOS-1.0-x86_64.iso \
+            AcreetionOS_XL-1.0-x86_64.iso \
+            springles@frs.sourceforge.net:/home/frs/project/acreetionos-iso-image/
+
       - name: Notify Discord (Finish)
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
