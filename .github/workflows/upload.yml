@@ -33,3 +33,11 @@ jobs:
             --metadata="title:AcreetionOS XL 1.0 x86_64" \
             --metadata="subject:linux;operating system;acreetionos" \
             --no-derive
+
+      - name: Notify Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{"content": "AcreetionOS ISOs have been uploaded to the Internet Archive successfully."}' \
+            "$DISCORD_WEBHOOK"
