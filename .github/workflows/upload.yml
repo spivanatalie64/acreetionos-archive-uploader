@@ -60,5 +60,5 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           curl -H "Content-Type: application/json" \
-            -d '{"content": "AcreetionOS ISOs have been uploaded to the Internet Archive successfully."}' \
+            -d '{"content": "AcreetionOS ISOs have been uploaded to the Internet Archive and SourceForge successfully."}' \
             "$DISCORD_WEBHOOK"
