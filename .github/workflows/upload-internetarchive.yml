@@ -48,8 +48,9 @@ jobs:
       - name: Install opencode CLI
         run: |
           npm install -g @opencode-ai/cli
-          echo "$(npm root -g)/../bin" >> "$GITHUB_PATH"
-          opencode --version
+          OPENCODE_PATH="$(npm root -g)/../bin"
+          echo "$OPENCODE_PATH" >> "$GITHUB_PATH"
+          "$OPENCODE_PATH/opencode" --version
 
       - name: Send Newsletter
         continue-on-error: true
