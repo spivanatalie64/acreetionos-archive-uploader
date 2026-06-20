@@ -48,6 +48,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Install opencode CLI
+        run: |
+          npm install -g @opencode-ai/cli
+          echo "$(npm config get prefix)/bin" >> "$GITHUB_PATH"
 
       - name: Send Newsletter
         continue-on-error: true
