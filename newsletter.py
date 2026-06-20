@@ -2,6 +2,7 @@
 """Generate and send ISO release newsletter using opencode for AI content."""
 
 import os
+import json
 import subprocess
 from datetime import datetime
 
@@ -93,25 +94,47 @@ def generate_newsletter():
 
 
 def send_newsletter(subject, body):
-    api_key = os.environ["BUTTONDOWN_API_KEY"]
+    """Post newsletter to the website repo via GitHub API instead of email."""
+    website_repo = "acreetionos-code/acreetionos-code.github.io"
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    filename = f"newsletters/iso-release-{date_str}.json"
 
-    response = requests.post(
-        "https://api.buttondown.email/v1/emails",
-        headers={
-            "Authorization": f"Token {api_key}",
-            "Content-Type": "application/json",
-        },
-        json={
-            "subject": subject,
-            "body": body,
-            "status": "about_to_send",
-        },
+    entry = {
+        "date": date_str,
+        "subject": subject,
+        "body": body,
+        "type": "iso_release",
+    }
+
+    headers = {
+        "Authorization": f"token {os.environ['GH_PAT']}",
+        "Accept": "application/vnd.github+json",
+    }
+
+    check = requests.get(
+        f"https://api.github.com/repos/{website_repo}/contents/{filename}",
+        headers=headers,
+    )
+    sha = check.json().get("sha") if check.status_code == 200 else None
+
+    import base64 as _b64
+    payload = {
+        "message": f"newsletter: add ISO release {date_str}",
+        "content": _b64.b64encode(json.dumps(entry, indent=2).encode()).decode(),
+    }
+    if sha:
+        payload["sha"] = sha
+
+    response = requests.put(
+        f"https://api.github.com/repos/{website_repo}/contents/{filename}",
+        headers=headers,
+        json=payload,
     )
 
     if response.status_code not in (200, 201):
-        raise Exception(f"Buttondown error {response.status_code}: {response.text}")
+        raise Exception(f"GitHub API error {response.status_code}: {response.text}")
 
-    print(f"Newsletter sent: {subject}")
+    print(f"Newsletter posted to website: {filename}")
 
 
 if __name__ == "__main__":
