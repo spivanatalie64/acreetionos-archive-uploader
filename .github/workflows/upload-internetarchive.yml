@@ -45,13 +45,18 @@ jobs:
             --metadata="subject:linux;operating system;acreetionos" \
             --no-derive
 
+      - name: Install opencode CLI
+        run: |
+          npm install -g @opencode-ai/cli
+          opencode --version
+
       - name: Send Newsletter
         continue-on-error: true
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENCODE_AUTH_JSON: ${{ secrets.OPENCODE_AUTH_JSON }}
           BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
         run: |
-          pip install anthropic requests
+          pip install requests
           python3 newsletter.py
 
       - name: Notify Discord (Finish)
