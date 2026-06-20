@@ -46,9 +46,7 @@ jobs:
             --no-derive
 
       - name: Install opencode CLI
-        run: |
-          npm install -g @opencode-ai/cli
-          npx opencode --version
+        run: npm install -g @opencode-ai/cli
 
       - name: Send Newsletter
         continue-on-error: true
