@@ -45,10 +45,9 @@ jobs:
             --metadata="subject:linux;operating system;acreetionos" \
             --no-derive
 
-      - name: Install opencode CLI
-        run: |
-          npm install -g @opencode-ai/cli
-          echo "$(npm root -g)/../bin" >> "$GITHUB_PATH"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
       - name: Send Newsletter
         continue-on-error: true
